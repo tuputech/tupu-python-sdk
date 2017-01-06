@@ -89,6 +89,7 @@ class TUPU:
                 multiple_files.append(('image', (image_file, open(image_file, 'rb'), 'application/*')))
             response = requests.post(self.__url, data=request_data, files=multiple_files)
         response_json = json.loads(response.text)
-        response_json['verify_result'] = self.__verify(response_json['signature'], response_json['json'])
-        response_json['json'] = json.loads(response_json['json'])
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(response_json['json'])
         return response_json
