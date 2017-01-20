@@ -56,15 +56,15 @@ class TUPU:
         self.__timestamp = datetime.datetime.now()
         self.__nonce = random.randint(1 << 4, 1 << 32)
         sign_string = "%s,%s,%s" % (self.__secret_id, self.__timestamp, self.__nonce)
-        self.__signature = base64.b64encode(rsa.sign(sign_string, self.__private_key, 'SHA-256'))
+        self.__signature = base64.b64encode(rsa.sign(sign_string.encode("utf-8"), self.__private_key, 'SHA-256'))
 
     def __verify(self, signature, verify_string):
         """verify the signature"""
         try:
-            rsa.verify(verify_string, base64.b64decode(signature), self.__public_key)
+            rsa.verify(verify_string.encode("utf-8"), base64.b64decode(signature), self.__public_key)
             return "Success"
         except rsa.pkcs1.VerificationError:
-            print "Verification Failed"
+            print ("Verification Failed")
         return "Failed"
 
     def api(self, images, is_url=False):
@@ -84,7 +84,7 @@ class TUPU:
             multiple_files = []
             for image_file in images:
                 if not os.path.isfile(image_file):
-                    print '[SKIP FILE] No such file "%s"' % image_file
+                    print ('[SKIP FILE] No such file "%s"' % image_file)
                     continue
                 multiple_files.append(('image', (image_file, open(image_file, 'rb'), 'application/*')))
             response = requests.post(self.__url, data=request_data, files=multiple_files)
