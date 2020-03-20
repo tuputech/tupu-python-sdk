@@ -83,7 +83,7 @@ class TUPU:
 
     def text_api(self, texts):
         if not isinstance(texts, list):
-            raise Exception('[ArgsError] sentences is a list')
+            raise Exception('[ArgsError] texts is a list')
         self.__sign()
         request_data = {
             "text": texts,

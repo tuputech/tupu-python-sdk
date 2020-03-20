@@ -4,7 +4,10 @@ SDK for TUPU visual recognition service
 ######
 <https://www.tuputech.com> 
 
+
 ## Install Dependencies
+Use python3
+
 ```
 sudo pip install rsa requests base64 json
 ```
