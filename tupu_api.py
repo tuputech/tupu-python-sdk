@@ -35,7 +35,7 @@ class TUPU:
     def __sign(self):
         """get the signature"""
         self.__timestamp = str(time.time())
-        self.__nonce = random.randint(1 << 4, 1 << 32)
+        self.__nonce = str(random.randint(1 << 4, 1 << 32))
         sign_string = "%s,%s,%s" % (
             self.__secret_id, self.__timestamp, self.__nonce)
         self.__signature = base64.b64encode(
@@ -87,8 +87,8 @@ class TUPU:
         self.__sign()
         request_data = {
             "text": texts,
-            "timestamp": self.__timestamp,
-            "nonce": self.__nonce,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
             "signature": self.__signature
         }
         response = requests.post(
