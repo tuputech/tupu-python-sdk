@@ -17,6 +17,16 @@ WQ4v2JR/BA6gVHV5TwIDAQAB
 """
 
 
+class VideoOptions:
+    def __init__(self):
+        self.customInfo = dict()
+        self.interval = 1
+        self.callbackRules = dict()
+        self.realTimeCallback = False
+        self.audio = False
+        self.task = list()
+
+
 class TUPU:
     def __init__(self, secret_id, private_key_path, url='http://api.open.tuputech.com/v3/recognition/'):
         self.__url = url + ('' if url.endswith('/') else '/') + secret_id
@@ -102,7 +112,7 @@ class TUPU:
                 response_json['json'])
         return response_json
 
-    def video_async(self, video_url, callback_url, options=None):
+    def video_async(self, video_url, callback_url, options: VideoOptions = None):
         self.__sign()
 
         request_data = {
@@ -113,12 +123,16 @@ class TUPU:
             "signature": self.__signature
         }
         if options:
-            request_data.customInfo = options.customInfo
-            request_data.interval = options.interval
-            request_data.callbackRules = options.callbackRules
-            request_data.realTimeCallback = options.realTimeCallback
-            request_data.audio = options.audio
-            request_data.task = options.task
+            if options.customInfo:
+                request_data['customInfo'] = options.customInfo
+            if options.interval:
+                request_data['interval'] = options.interval
+            if options.callbackRules:
+                request_data['callbackRules'] = options.callbackRules
+            if options.task:
+                request_data['task'] = options.task
+            request_data['realTimeCallback'] = options.realTimeCallback
+            request_data['audio'] = options.audio
 
         response = requests.post(
             self.__video_url, json=request_data)
