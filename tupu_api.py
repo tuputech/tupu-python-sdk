@@ -1,4 +1,3 @@
-
 import os
 import random
 import datetime
@@ -22,6 +21,8 @@ class TUPU:
     def __init__(self, secret_id, private_key_path, url='http://api.open.tuputech.com/v3/recognition/'):
         self.__url = url + ('' if url.endswith('/') else '/') + secret_id
         self.__text_url = url + 'text/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__video_url = url + 'video/asyncscan/' + \
             ('' if url.endswith('/') else '/') + secret_id
         self.__secret_id = secret_id
         # get private key
@@ -93,6 +94,34 @@ class TUPU:
         }
         response = requests.post(
             self.__text_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def video_async(self, video_url, callback_url, options=None):
+        self.__sign()
+
+        request_data = {
+            "video": video_url,
+            "callbackUrl": callback_url,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        if options:
+            request_data.customInfo = options.customInfo
+            request_data.interval = options.interval
+            request_data.callbackRules = options.callbackRules
+            request_data.realTimeCallback = options.realTimeCallback
+            request_data.audio = options.audio
+            request_data.task = options.task
+
+        response = requests.post(
+            self.__video_url, json=request_data)
         response_json = json.loads(response.text)
         if not "error" in response_json:
             response_json['verify_result'] = self.__verify(
