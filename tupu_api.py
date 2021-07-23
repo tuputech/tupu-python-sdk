@@ -124,11 +124,11 @@ class TUPU:
                 response_json['json'])
         return response_json
 
-    def video_async(self, video_url, callback_url, options={}):
+    def video_async(self, video, callback_url, options={}):
         self.__sign()
 
         request_data = {
-            "video": video_url,
+            "video": video,
             "callbackUrl": callback_url,
             "timestamp": float(self.__timestamp),
             "nonce": float(self.__nonce),
