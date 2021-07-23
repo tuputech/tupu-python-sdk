@@ -80,7 +80,7 @@ tupu = TUPU(secret_id='your_secret_id',
 
 video = "http://example.com/001.mp4" or "/home/source/001.mp4"
 
-// 可选参数
+# 可选参数
 options = { 
     "interval": 1,
     "maxFrames": 200,
@@ -101,7 +101,7 @@ tupu = TUPU(secret_id='your_secret_id',
 video = "http://example.com/001.mp4"
 callbackUrl = "http://example.com/callbackUrl"
 
-// 可选参数
+# 可选参数
 options = { 
     "customInfo": {},
     "interval": 3,
@@ -125,7 +125,7 @@ tupu = TUPU(secret_id='your_secret_id',
 video = "http://example.com/001.mp4"
 callbackUrl = "http://example.com/callbackUrl"
 
-// 可选参数
+# 可选参数
 options = { 
     "customInfo": {},
     "interval": 3,
