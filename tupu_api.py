@@ -17,22 +17,34 @@ WQ4v2JR/BA6gVHV5TwIDAQAB
 """
 
 
-class VideoOptions:
-    def __init__(self):
-        self.customInfo = dict()
-        self.interval = 1
-        self.callbackRules = dict()
-        self.realTimeCallback = False
-        self.audio = False
-        self.task = list()
-
-
 class TUPU:
     def __init__(self, secret_id, private_key_path, url='http://api.open.tuputech.com/v3/recognition/'):
         self.__url = url + ('' if url.endswith('/') else '/') + secret_id
         self.__text_url = url + 'text/' + \
             ('' if url.endswith('/') else '/') + secret_id
-        self.__video_url = url + 'video/asyncscan/' + \
+        self.__video_sync_url = url + 'video/syncscan/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__video_async_url = url + 'video/asyncscan/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__video_stream_url = url + 'video/stream/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__video_close_url = url + 'video/close/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__video_result_url = url + 'video/result/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__video_rate_url = url + 'video/rate/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__speech_url = url + 'speech/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__speech_async_url = url + 'speech/recording/async/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__speech_result_url = url + 'speech/recording/result/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__speech_stream_url = url + 'speech/stream/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__speech_stream_close_url = url + 'speech/stream/close/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__speech_stream_search_url = url + 'speech/stream/search/' + \
             ('' if url.endswith('/') else '/') + secret_id
         self.__secret_id = secret_id
         # get private key
@@ -46,7 +58,7 @@ class TUPU:
     def __sign(self):
         """get the signature"""
         self.__timestamp = str(time.time())
-        self.__nonce = str(random.randint(1 << 4, 1 << 32))
+        self.__nonce = str(random.random())
         sign_string = "%s,%s,%s" % (
             self.__secret_id, self.__timestamp, self.__nonce)
         self.__signature = base64.b64encode(
@@ -112,30 +124,253 @@ class TUPU:
                 response_json['json'])
         return response_json
 
-    def video_async(self, video_url, callback_url, options: VideoOptions = None):
+    def video_async(self, video, callback_url, options={}):
         self.__sign()
 
         request_data = {
-            "video": video_url,
+            "video": video,
             "callbackUrl": callback_url,
             "timestamp": float(self.__timestamp),
             "nonce": float(self.__nonce),
             "signature": self.__signature
         }
         if options:
-            if options.customInfo:
-                request_data['customInfo'] = options.customInfo
-            if options.interval:
-                request_data['interval'] = options.interval
-            if options.callbackRules:
-                request_data['callbackRules'] = options.callbackRules
-            if options.task:
-                request_data['task'] = options.task
-            request_data['realTimeCallback'] = options.realTimeCallback
-            request_data['audio'] = options.audio
+            for key in options:
+                request_data[key] = options[key]
 
         response = requests.post(
-            self.__video_url, json=request_data)
+            self.__video_async_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def video_stream(self, video, callback_url, options={}):
+        self.__sign()
+
+        request_data = {
+            "video": video,
+            "callbackUrl": callback_url,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        if options:
+            for key in options:
+                request_data[key] = options[key]
+
+        response = requests.post(
+            self.__video_stream_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def video_sync(self, video, options={}):
+        self.__sign()
+
+        request_data = {
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        if options:
+            for key in options:
+                request_data[key] = options[key]
+
+        if os.path.isfile(video):
+            files = {'video': (video, open(video, 'rb'), "video/mp4")}
+        else:
+            files = {'video': (None, video)}
+        response = requests.post(
+            self.__video_sync_url, data=request_data, files=files)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def video_close(self, videoId):
+        self.__sign()
+
+        request_data = {
+            "videoId": videoId,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        response = requests.post(
+            self.__video_close_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def video_result(self, videoId):
+        self.__sign()
+
+        request_data = {
+            "videoId": videoId,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        response = requests.post(
+            self.__video_result_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def video_rate(self):
+        self.__sign()
+
+        request_data = {
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        response = requests.post(
+            self.__video_rate_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def speech(self, speech, options={}):
+        self.__sign()
+        request_data = {
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature,
+        }
+        if options:
+            for key in options:
+                request_data[key] = options[key]
+        files = ""
+        if os.path.isfile(speech):
+            files = {'speech': (speech, open(speech, 'rb'))}
+        else:
+            request_data["speech"] = (None, speech)
+        response = requests.post(
+            self.__speech_url, data=request_data, files=files)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def speech_async(self, recording):
+        self.__sign()
+
+        request_data = {
+            "recording": recording,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        response = requests.post(
+            self.__speech_async_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def speech_result(self, requestId):
+        self.__sign()
+
+        request_data = {
+            "requestId": requestId,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        response = requests.post(
+            self.__speech_result_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def speech_stream(self, speechStream):
+        if not isinstance(speechStream, list):
+            raise Exception('[ArgsError] speechStream is a list')
+        self.__sign()
+
+        request_data = {
+            "speechStream": speechStream,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+
+        response = requests.post(
+            self.__speech_stream_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def speech_stream_close(self, speechStream):
+        if not isinstance(speechStream, list):
+            raise Exception('[ArgsError] speechStream is a list')
+        self.__sign()
+
+        request_data = {
+            "speechStream": speechStream,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        response = requests.post(
+            self.__speech_stream_close_url, json=request_data)
+        response_json = json.loads(response.text)
+        if not "error" in response_json:
+            response_json['verify_result'] = self.__verify(
+                response_json['signature'], response_json['json'])
+            response_json['json'] = json.loads(
+                response_json['json'])
+        return response_json
+
+    def speech_stream_search(self, requestId):
+        self.__sign()
+
+        request_data = {
+            "requestId": requestId,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        response = requests.post(
+            self.__speech_stream_search_url, json=request_data)
         response_json = json.loads(response.text)
         if not "error" in response_json:
             response_json['verify_result'] = self.__verify(
