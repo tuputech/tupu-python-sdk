@@ -24,7 +24,7 @@ tupu_client = TUPU(secret_id, private_key_path, url)
 
 ## Example
 
-### image file
+### image file （图片文件）
 ```python
 from tupu_api import TUPU
 tupu = TUPU(secret_id='your_secret_id',
@@ -36,7 +36,7 @@ result = tupu.api(images=images, is_url=False)
 print(result)
 ```
 
-### image url
+### image url （图片链接）
 ```python
 from tupu_api import TUPU
 
@@ -49,7 +49,7 @@ result = tupu.api(images=images, is_url=True)
 print(result)
 ```
 
-### text
+### text （文本）
 ```python
 from tupu_api import TUPU
 tupu = TUPU(secret_id='your_secret_id',
@@ -68,6 +68,201 @@ texts = [
     }
 ]
 result = tupu.text_api(texts=texts)
+
+print(result)
+```
+
+### video syncscan  （视频同步识别）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+video = "http://example.com/001.mp4" or "/home/source/001.mp4"
+
+// 可选参数
+options = { 
+    "interval": 1,
+    "maxFrames": 200,
+    "tag": "tag",
+    "task": ["id"]
+}
+result = tupu.video_sync(video=video, options=options)
+
+print(result)
+```
+
+### video asyncscan  （视频文件异步识别）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+video = "http://example.com/001.mp4"
+callbackUrl = "http://example.com/callbackUrl"
+
+// 可选参数
+options = { 
+    "customInfo": {},
+    "interval": 3,
+    "callbackRules": {},
+    "realTimeCallback": false,
+    "audio": false,
+    "task": ["id"]
+}
+result = tupu.video_async(video=video, callbackUrl=callbackUrl, options=options)
+
+print(result)
+```
+
+
+### video stream  （视频流异步识别）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+video = "http://example.com/001.mp4"
+callbackUrl = "http://example.com/callbackUrl"
+
+// 可选参数
+options = { 
+    "customInfo": {},
+    "interval": 3,
+    "fragmentTime": 60,
+    "callbackRules": {},
+    "audio": false,
+    "task": ["id"]
+}
+result = tupu.video_stream(video=video, callbackUrl=callbackUrl, options=options)
+
+print(result)
+```
+
+### video close  （关闭异步识别）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+videoId = ""
+result = tupu.video_close(videoId=videoId)
+
+print(result)
+```
+
+### video search  （查询异步识别结果）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+videoId = ""
+result = tupu.video_result(videoId=videoId)
+
+print(result)
+```
+
+### video rate  （查询异步识别并发及待处理任务数）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+result = tupu.video_rate()
+
+print(result)
+```
+
+
+### speech （语音文件同步）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+speech = "http://example.com/001.mp3" or "/home/source/001.mp3"
+result = tupu.speech(speech=speech)
+
+print(result)
+```
+
+### speech async（语音文件异步）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+recording = {
+    "url": "http://www.tupu.com/test.mp3",
+    "callbackUrl": "http://your_cb.com",
+    "roomId": "your_room_id",
+    "userId": "your_user_id",
+    "forumId": "your_forum_id"
+  }
+result = tupu.speech_async(recording=recording)
+
+print(result)
+```
+
+### speech async result（语音文件异步结果查询）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+requestId = "your_requestId"
+result = tupu.speech_result(requestId=requestId)
+
+print(result)
+```
+
+### speech stream（音频流提交接口）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+speechStream = [
+  {
+    "url": "rtmp://pili-Room-4daedc9c7a5db36c325f6609000c0201",
+    "callback": "http://www.tupu.com/callback",
+    "roomId": "111111",
+    "userId": "23231",
+    "forumId": "321313"
+  }
+]
+result = tupu.speech_stream(speechStream=speechStream)
+
+print(result)
+```
+
+
+### speech stream close（音频流关闭接口）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+speechStream = [
+  {
+      "requestId": "5c8213b9bc807806aab0a321"
+  }
+]
+result = tupu.speech_stream_close(speechStream=speechStream)
+
+print(result)
+```
+
+
+### speech stream search（语音流状态查询接口）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+requestId = "your_requestId"
+result = tupu.speech_stream_search(requestId=your_requestId)
 
 print(result)
 ```
