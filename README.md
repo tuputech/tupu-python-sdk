@@ -266,3 +266,57 @@ result = tupu.speech_stream_search(requestId=your_requestId)
 
 print(result)
 ```
+
+### feedback image file（数据回流-图片文件上传接口）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem', 'http://feedback.open.tuputech.com/v1/')
+
+images = [{
+    "image": "/home/user/001.jpg",
+    "taskId": "54bcfc6c329af61034f7c2fc" # 图普对应的任务Id, 参考：http://cloud.doc.tuputech.com/zh/taskList/imageLabel.html
+    "label": 1  # 图普对应的任务标签
+}]
+result = tupu.feedback_image_file(images=images)
+
+print(result)
+```
+
+### feedback image url（数据回流-图片url上传接口）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem', 'http://feedback.open.tuputech.com/v1/')
+
+images = [{
+    "imageUrl": "http://example.com/001.jpg",
+    "label": 1  # 图普对应的任务标签
+}, {
+    "imageUrl": "http://example.com/002.jpg",
+    "label": 1  # 图普对应的任务标签
+}]
+taskId = "54bcfc6c329af61034f7c2fc" # 图普对应的任务Id, 参考：http://cloud.doc.tuputech.com/zh/taskList/imageLabel.html
+result = tupu.feedback_image_url(images=images, taskId=taskId)
+
+print(result)
+```
+
+
+### feedback text url（数据回流-文本上传接口）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem', 'http://feedback.open.tuputech.com/v1/')
+
+texts = [{
+    "content": "string",  # 文本
+    "mainLabel": "string",  # 第一级类别取值
+    "subLabel": "string",  # 第二级类别取值
+    "level": "danger"   # 违规危险程度 ['danger', 'warn']
+}]
+taskId = "57c4036c557603652aeeb222" # 图普对应的任务Id, 参考：http://cloud.doc.tuputech.com/zh/taskList/textLabel.html
+result = tupu.feedback_text_string(texts=texts, taskId=taskId)
+
+print(result)
+```
