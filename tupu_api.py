@@ -46,6 +46,12 @@ class TUPU:
             ('' if url.endswith('/') else '/') + secret_id
         self.__speech_stream_search_url = url + 'speech/stream/search/' + \
             ('' if url.endswith('/') else '/') + secret_id
+        self.__feedback_image_file_url = url + 'feedback/image/file/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__feedback_image_url_url = url + 'feedback/image/url/' + \
+            ('' if url.endswith('/') else '/') + secret_id
+        self.__feedback_text_string_url = url + 'feedback/text/string/' + \
+            ('' if url.endswith('/') else '/') + secret_id
         self.__secret_id = secret_id
         # get private key
         with open(private_key_path) as private_key_file:
@@ -377,4 +383,64 @@ class TUPU:
                 response_json['signature'], response_json['json'])
             response_json['json'] = json.loads(
                 response_json['json'])
+        return response_json
+
+    def feedback_image_url(self, images, taskId):
+        self.__sign()
+        headers = {
+            "timestamp": self.__timestamp,
+            "nonce": self.__nonce,
+            "signature": self.__signature,
+        }
+        request_data = {
+            "taskId": taskId,
+            "fileList": images
+        }
+        print(request_data)
+        response = requests.post(
+            self.__feedback_image_url_url, headers=headers, json=request_data)
+        response_json = json.loads(response.text)
+        return response_json
+
+    def feedback_image_file(self, images):
+        if not isinstance(images, list):
+            raise Exception('[ArgsError] images is a list')
+        self.__sign()
+        headers = {
+            "timestamp": self.__timestamp,
+            "nonce": self.__nonce,
+            "signature": self.__signature,
+        }
+        request_data = {
+            "taskId": [],
+            "label": []
+        }
+
+        multiple_files = []
+        for imageObject in images:
+            multiple_files.append(
+                ('image', (imageObject["image"], open(imageObject["image"], 'rb'))))
+            request_data["taskId"].append(imageObject["taskId"])
+            request_data["label"].append(imageObject["label"])
+        print(multiple_files)
+        response = requests.post(
+            self.__feedback_image_file_url, headers=headers, data=request_data, files=multiple_files)
+        response_json = json.loads(response.text)
+        return response_json
+
+    def feedback_text_string(self, texts, taskId):
+        self.__sign()
+        headers = {
+            "timestamp": self.__timestamp,
+            "nonce": self.__nonce,
+            "signature": self.__signature,
+        }
+        request_data = {
+            "taskId": taskId,
+            "texts": texts
+        }
+        print(request_data)
+        response = requests.post(
+            self.__feedback_text_string_url, headers=headers, json=request_data)
+        response_json = json.loads(response.text)
         return response_json
