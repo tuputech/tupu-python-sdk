@@ -396,7 +396,6 @@ class TUPU:
             "taskId": taskId,
             "fileList": images
         }
-        print(request_data)
         response = requests.post(
             self.__feedback_image_url_url, headers=headers, json=request_data)
         response_json = json.loads(response.text)
@@ -422,7 +421,6 @@ class TUPU:
                 ('image', (imageObject["image"], open(imageObject["image"], 'rb'))))
             request_data["taskId"].append(imageObject["taskId"])
             request_data["label"].append(imageObject["label"])
-        print(multiple_files)
         response = requests.post(
             self.__feedback_image_file_url, headers=headers, data=request_data, files=multiple_files)
         response_json = json.loads(response.text)
@@ -439,7 +437,6 @@ class TUPU:
             "taskId": taskId,
             "texts": texts
         }
-        print(request_data)
         response = requests.post(
             self.__feedback_text_string_url, headers=headers, json=request_data)
         response_json = json.loads(response.text)
