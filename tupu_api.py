@@ -386,6 +386,8 @@ class TUPU:
         return response_json
 
     def feedback_image_url(self, images, taskId):
+        if not isinstance(images, list):
+            raise Exception('[ArgsError] images is a list')
         self.__sign()
         headers = {
             "timestamp": self.__timestamp,
@@ -427,6 +429,8 @@ class TUPU:
         return response_json
 
     def feedback_text_string(self, texts, taskId):
+        if not isinstance(texts, list):
+            raise Exception('[ArgsError] texts is a list')
         self.__sign()
         headers = {
             "timestamp": self.__timestamp,
