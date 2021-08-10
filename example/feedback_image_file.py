@@ -4,11 +4,8 @@ tupu = TUPU(secret_id='your_secret_id',
 
 images = [{
     "image": "/home/user/001.jpg",
-    "taskId": "图普对应的任务id",
-    "label": 1  # 图普对应的任务标签
-}, {
-    "image": "/home/user/002.jpg",
-    "taskId": "图普对应的任务id",
+    # 图普对应的任务Id, 参考：http://cloud.doc.tuputech.com/zh/taskList/imageLabel.html
+    "taskId": "54bcfc6c329af61034f7c2fc"
     "label": 1  # 图普对应的任务标签
 }]
 result = tupu.feedback_image_file(images=images)

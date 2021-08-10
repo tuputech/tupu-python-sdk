@@ -9,7 +9,8 @@ images = [{
     "imageUrl": "http://example.com/002.jpg",
     "label": 1  # 图普对应的任务标签
 }]
-taskId = "图普对应的任务id"
+# 图普对应的任务Id, 参考：http://cloud.doc.tuputech.com/zh/taskList/imageLabel.html
+taskId = "54bcfc6c329af61034f7c2fc"
 result = tupu.feedback_image_url(images=images, taskId=taskId)
 
 print(result)
