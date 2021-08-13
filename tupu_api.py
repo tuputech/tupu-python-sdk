@@ -52,6 +52,8 @@ class TUPU:
             ('' if url.endswith('/') else '/') + secret_id
         self.__feedback_text_string_url = url + 'feedback/text/string/' + \
             ('' if url.endswith('/') else '/') + secret_id
+        self.__image_sync_base64_url = url + 'image/sync/base64/' + \
+            ('' if url.endswith('/') else '/') + secret_id
         self.__secret_id = secret_id
         # get private key
         with open(private_key_path) as private_key_file:
@@ -443,5 +445,24 @@ class TUPU:
         }
         response = requests.post(
             self.__feedback_text_string_url, headers=headers, json=request_data)
+        response_json = json.loads(response.text)
+        return response_json
+
+    def image_sync_base64(self, images, options={}):
+        if not isinstance(images, list):
+            raise Exception('[ArgsError] images is a list')
+        self.__sign()
+
+        request_data = {
+            "images": images,
+            "timestamp": float(self.__timestamp),
+            "nonce": float(self.__nonce),
+            "signature": self.__signature
+        }
+        if options:
+            for key in options:
+                request_data[key] = options[key]
+        response = requests.post(
+            self.__image_sync_base64_url, json=request_data)
         response_json = json.loads(response.text)
         return response_json
