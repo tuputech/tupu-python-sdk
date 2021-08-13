@@ -49,6 +49,23 @@ result = tupu.api(images=images, is_url=True)
 print(result)
 ```
 
+### image base64 （base64编码图像）
+```python
+from tupu_api import TUPU
+tupu = TUPU(secret_id='your_secret_id',
+            private_key_path='./rsa_private_key.pem')
+
+images = ["base64_0", "base64_1"]
+# 可选参数
+options = { 
+    "tags": [],
+    "tasks": []
+}
+result = tupu.image_sync_base64(images=images, options=options)
+
+print(result)
+```
+
 ### text （文本）
 ```python
 from tupu_api import TUPU
